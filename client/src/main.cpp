@@ -85,5 +85,29 @@ int main(int argc, char *argv[]){
     
     cJSON_Delete(config);
 
+    // handle SIGINT
+    signal(SIGINT, [](int sig) {
+        close(sockfd);
+        exit(0);
+    });
+    struct sockaddr_in serv_addr;
+    if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
+        cout << "Error opening socket" << endl;
+        return 1;
+    }
+    memset((char *) &serv_addr, 0, sizeof(serv_addr));
+    set_server_addr(&serv_addr, ip.c_str(), to_string(port).c_str());
+    cout << "Iniciando servidor distribuído no Ip: "
+    << inet_ntoa(serv_addr.sin_addr)
+    << " na porta: " << port << endl;
+    if (bind(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0) {
+        cout << "Error on binding" << endl;
+        return 1;
+    }
+
+    listen(sockfd, 5);
+
+    close(sockfd);
+
     return 0;
 }
