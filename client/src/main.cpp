@@ -16,6 +16,7 @@
 using namespace std;
 
 #include "DHTModule.hpp"
+#include "Messager.hpp"
 
 int sockfd;
 
@@ -42,29 +43,6 @@ vector<GPIO_Pin> get_gpio_info(cJSON * json, string item) {
         }
     }
     return gpio_pins;
-}
-
-void set_server_addr(struct sockaddr_in * serv_addr, const char * addr, const char * port) {
-  int errcode;
-  struct addrinfo hints, *result;
-
-  memset(&hints, 0, sizeof (hints));
-
-  hints.ai_family = PF_UNSPEC;
-  hints.ai_socktype = SOCK_STREAM;
-  hints.ai_flags |= AI_CANONNAME;
-
-  errcode = getaddrinfo (addr, NULL, &hints, &result);
-
-  if (errcode != 0) {
-    perror ("getaddrinfo");
-    return;
-  }
-
-  serv_addr->sin_family = AF_INET;
-  struct sockaddr_in * temp_addr = (struct sockaddr_in *) result->ai_addr;
-  serv_addr->sin_addr = temp_addr->sin_addr; 
-  serv_addr->sin_port = htons(atoi(port));
 }
 
 int main(int argc, char *argv[]){
