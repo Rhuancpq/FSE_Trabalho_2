@@ -14,6 +14,7 @@ void DHTModule::operator()(bool & is_end) {
 
         cout << "Temperatura: " << temp_cels << " C" << endl;
         cout << "Umidade: " << humidity << "%" << endl;
+        this_thread::sleep_for(chrono::seconds(1s));
 
     }
 }

@@ -7,7 +7,7 @@
 
 #include "dht22.h"
 
-uint8_t dht_pin = 28;  // current using gpio pin 20 (wiringPi pin 28)
+uint8_t dht_pin = 20;  // current using gpio pin 20 (wiringPi pin 28)
 char mode = 'c';      // valid modes are c, f, h
 
 float temp_cels = -1;
@@ -94,7 +94,7 @@ void printUsage() {
 }
 
 int init() {
-	if (wiringPiSetup() == -1) {
+	if (wiringPiSetupGpio() == -1) {
 		fprintf(stderr, "Failed to initialize wiringPi\n");
 		exit(1);
 		return 1;

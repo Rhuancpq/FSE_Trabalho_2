@@ -3,6 +3,7 @@
 
 #include <wiringPi.h>
 #include <thread>
+#include <iostream>
 using namespace std;
 
 class GPIOOutModule {

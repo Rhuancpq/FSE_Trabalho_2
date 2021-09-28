@@ -1,10 +1,11 @@
 #include "GPIOOutModule.hpp"
 
 /**
-* @param pin: WiringPi pin number
+* @param pin: GPIO pin number
 */
 void GPIOOutModule::operator()(int pin, const bool & is_end, const int & out_value){
-    if(wiringPiSetup() == -1){
+    if(wiringPiSetupGpio() == -1){
+        cerr << "Error: wiringPiSetupGpio()" << endl;
         return;
     }
 

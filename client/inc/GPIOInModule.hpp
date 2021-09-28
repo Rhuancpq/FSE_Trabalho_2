@@ -8,7 +8,7 @@ using namespace std;
 
 class GPIOInModule {
 public:
-    void operator()(int pin, const bool & is_end);
+    void operator()(int pin, const bool & is_end, string type, string tag);
 };
 
 #endif

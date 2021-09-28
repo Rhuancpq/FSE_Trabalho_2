@@ -2,6 +2,7 @@
 #define __DHTMODULE_HPP__
 
 #include <iostream>
+#include <thread>
 using namespace std;
 
 extern "C" {

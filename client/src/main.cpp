@@ -12,13 +12,17 @@
 #include <cstdio>
 #include <cstring>
 #include <signal.h>
+#include <unordered_map>
 #include <thread>
 using namespace std;
 
 #include "DHTModule.hpp"
+#include "GPIOInModule.hpp"
+#include "GPIOOutModule.hpp"
 #include "Messager.hpp"
 
 int sockfd;
+bool is_end = false;
 
 typedef struct GPIO_Pin {
     int pin; // JSON gpio item
@@ -45,7 +49,20 @@ vector<GPIO_Pin> get_gpio_info(cJSON * json, string item) {
     return gpio_pins;
 }
 
+void terminate(int sig) {
+    if (sig == SIGINT || sig == SIGTERM || sig == SIGQUIT) {
+        is_end = true;
+    }
+    cout << "Encerrando programa..." << endl;
+    sleep(1);
+    cout << "Programa encerrado!" << endl;
+    exit(0);
+}
+
 int main(int argc, char *argv[]){
+    signal(SIGINT, terminate);
+    signal(SIGTERM, terminate);
+    signal(SIGQUIT, terminate);
     string config_file = argv[1];
     ifstream t(config_file);
     // if file doesn't exist, exit
@@ -63,6 +80,12 @@ int main(int argc, char *argv[]){
     string name = cJSON_GetObjectItem(config, "nome")->valuestring;
     vector<GPIO_Pin> gpio_inputs = get_gpio_info(config, "inputs");
     vector<GPIO_Pin> gpio_outputs = get_gpio_info(config, "outputs");
+
+    unordered_map<string, int> gpio_out_values;
+
+    for (GPIO_Pin gpio_pin : gpio_outputs) {
+        gpio_out_values[gpio_pin.tag] = 0;
+    }
     
     cJSON_Delete(config);
 
@@ -88,13 +111,27 @@ int main(int argc, char *argv[]){
 
     // listen(sockfd, 5);
 
-    bool is_end = false;
-
     DHTModule dht;
 
     thread dht_thread(dht, ref(is_end));
     
     dht_thread.detach();
+
+    for (GPIO_Pin gpio_pin : gpio_inputs) {
+        GPIOInModule gpio_in;
+        thread gpio_in_thread(gpio_in, gpio_pin.pin, ref(is_end),
+        gpio_pin.type, gpio_pin.tag);
+        gpio_in_thread.detach();
+    }
+
+    for (GPIO_Pin gpio_pin : gpio_outputs) {
+        GPIOOutModule gpio_out;
+        thread gpio_out_thread(gpio_out, gpio_pin.pin, ref(is_end),
+        ref(gpio_out_values[gpio_pin.tag]));
+        gpio_out_thread.detach();
+    }
+
+    sleep(30);
 
     // close(sockfd);
 
