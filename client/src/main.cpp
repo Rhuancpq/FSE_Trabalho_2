@@ -4,13 +4,6 @@
 #include <iostream>
 #include <vector>
 #include <streambuf>
-#include <sys/socket.h>
-#include <arpa/inet.h>
-#include <netinet/in.h>
-#include <netdb.h>
-#include <unistd.h>
-#include <cstdio>
-#include <cstring>
 #include <signal.h>
 #include <unordered_map>
 #include <thread>
@@ -20,6 +13,7 @@ using namespace std;
 #include "GPIOInModule.hpp"
 #include "GPIOOutModule.hpp"
 #include "Messager.hpp"
+#include "Listener.hpp"
 
 int sockfd;
 bool is_end = false;
@@ -89,27 +83,11 @@ int main(int argc, char *argv[]){
     
     cJSON_Delete(config);
 
-    // // handle SIGINT
-    // signal(SIGINT, [](int sig) {
-    //     close(sockfd);
-    //     exit(0);
-    // });
-    // struct sockaddr_in serv_addr;
-    // if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
-    //     cout << "Error opening socket" << endl;
-    //     return 1;
-    // }
-    // memset((char *) &serv_addr, 0, sizeof(serv_addr));
-    // set_server_addr(&serv_addr, ip.c_str(), to_string(port).c_str());
-    // cout << "Iniciando servidor distribuído no Ip: "
-    // << inet_ntoa(serv_addr.sin_addr)
-    // << " na porta: " << port << endl;
-    // if (bind(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0) {
-    //     cout << "Error on binding" << endl;
-    //     return 1;
-    // }
+    Listener listener;
 
-    // listen(sockfd, 5);
+    thread listener_thread(listener, cref(is_end), ip, port);
+
+    listener_thread.detach();
 
     DHTModule dht;
 
@@ -132,8 +110,6 @@ int main(int argc, char *argv[]){
     }
 
     sleep(30);
-
-    // close(sockfd);
 
     return 0;
 }
