@@ -12,9 +12,23 @@ void DHTModule::operator()(bool & is_end) {
             delay(WAIT_TIME);
         }
 
-        cout << "Temperatura: " << temp_cels << " C" << endl;
-        cout << "Umidade: " << humidity << "%" << endl;
-        this_thread::sleep_for(chrono::seconds(1s));
+        done = 0;
+
+        // TODO: send data to server
+        cJSON * json = cJSON_CreateObject();
+        // type data 
+        cJSON_AddStringToObject(json, "type", "data");
+        cJSON * data = cJSON_CreateObject();
+        cJSON_AddStringToObject(data, "tag", "temperature");
+        cJSON_AddNumberToObject(data, "temperature", temp_cels);
+        cJSON_AddNumberToObject(data, "humidity", humidity);
+        cJSON_AddItemToObject(json, "data", data);
+        if(send_message(json) < 0){
+            cerr << "Error sending data to server" << endl;
+        }
+        cJSON_Delete(json);
+
+        this_thread::sleep_for(900ms);
 
     }
 }

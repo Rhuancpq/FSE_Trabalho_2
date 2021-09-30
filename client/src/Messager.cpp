@@ -59,7 +59,7 @@ int send_message(cJSON *message) {
         return -1;
     }
 
-    // TODO wait confirm from server
+    // TODO maybe wait confirm from server
 
     // close socket
     close(sockfd);

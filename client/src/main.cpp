@@ -78,6 +78,9 @@ int main(int argc, char *argv[]){
     
     cJSON_Delete(config);
 
+    // TODO change server address
+    // server_addr = "";
+
     Listener listener;
 
     thread listener_thread(listener, cref(is_end), ip, port,

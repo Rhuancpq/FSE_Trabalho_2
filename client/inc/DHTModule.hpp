@@ -9,6 +9,9 @@ extern "C" {
     #include "dht22.h"
 }
 
+#include "Messager.hpp"
+#include "cJSON.h"
+
 class DHTModule {
 public:
     void operator()(bool & is_end); 
