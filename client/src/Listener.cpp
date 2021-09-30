@@ -12,7 +12,44 @@ int is_ready(int fd) {
   return select(fd+1, &fdset, NULL, NULL, &timeout) == 1;
 }
 
-void Listener::operator()(const bool & is_end, string ip, int port) {
+cJSON * create_init_message(string ip, int port, 
+const vector<GPIO_Pin> & inputs, const vector<GPIO_Pin> & outputs) {
+    cJSON * init_message = cJSON_CreateObject();
+    cJSON_AddStringToObject(init_message, "type", "init");
+    cJSON_AddStringToObject(init_message, "ip", ip.c_str());
+    cJSON_AddNumberToObject(init_message, "port", port);
+    // inputs
+    cJSON * inputs_array = cJSON_CreateArray();
+    for (auto & input : inputs) {
+        cJSON * input_object = cJSON_CreateObject();
+        cJSON_AddStringToObject(input_object, "tag", input.tag.c_str());
+        cJSON_AddStringToObject(input_object, "type", input.type.c_str());
+        cJSON_AddItemToArray(inputs_array, input_object);
+    }
+    // outputs
+    cJSON * outputs_array = cJSON_CreateArray();
+    for (auto & output : outputs) {
+        cJSON * output_object = cJSON_CreateObject();
+        cJSON_AddStringToObject(output_object, "tag", output.tag.c_str());
+        cJSON_AddStringToObject(output_object, "type", output.type.c_str());
+        cJSON_AddItemToArray(outputs_array, output_object);
+    }
+    cJSON_AddItemToObject(init_message, "inputs", inputs_array);
+    cJSON_AddItemToObject(init_message, "outputs", outputs_array);
+    return init_message;
+}
+
+cJSON * create_leave_message(string ip, int port) {
+    cJSON * leave_message = cJSON_CreateObject();
+    cJSON_AddStringToObject(leave_message, "type", "leave");
+    cJSON_AddStringToObject(leave_message, "ip", ip.c_str());
+    cJSON_AddNumberToObject(leave_message, "port", port);
+    return leave_message;
+}
+
+void Listener::operator()(const bool & is_end, string ip, int port,
+unordered_map<string, int> & gpio_out_values, 
+const vector<GPIO_Pin> & in_gpios, const vector<GPIO_Pin> & out_gpios) {
     int sockfd;
 
     struct sockaddr_in serv_addr;
@@ -32,7 +69,9 @@ void Listener::operator()(const bool & is_end, string ip, int port) {
 
     listen(sockfd, 5);
 
-    // TODO send message to central server to inform that this server is ready
+    cJSON * init_message = create_init_message(ip, port, in_gpios, out_gpios);
+    send_message(init_message);
+    cJSON_Delete(init_message);
 
     while (!is_end) {
         if (is_ready(sockfd)) {
@@ -45,13 +84,17 @@ void Listener::operator()(const bool & is_end, string ip, int port) {
             }
             cout << "Conectado com o cliente: " << inet_ntoa(cli_addr.sin_addr) << endl;
             // TODO criar thread para tratar conexão
-
+            Worker worker;
+            thread worker_thread(worker, newsockfd, ref(cli_addr),  ref(gpio_out_values));
+            worker_thread.detach();
         }
         // Dormir por 50ms
         this_thread::sleep_for(50ms);
     }
 
-    // TODO send message to central server to inform that this server is leaving
+    cJSON * leave_message = create_leave_message(ip, port);
+    send_message(leave_message);
+    cJSON_Delete(leave_message);
 
     close(sockfd);
 }

@@ -14,15 +14,10 @@ using namespace std;
 #include "GPIOOutModule.hpp"
 #include "Messager.hpp"
 #include "Listener.hpp"
+#include "GPIO.hpp"
 
 int sockfd;
 bool is_end = false;
-
-typedef struct GPIO_Pin {
-    int pin; // JSON gpio item
-    string type = ""; // JSON type item
-    string tag = ""; // JSON tag item
-} GPIO_Pin;
 
 vector<GPIO_Pin> get_gpio_info(cJSON * json, string item) {
     vector<GPIO_Pin> gpio_pins;
@@ -85,7 +80,8 @@ int main(int argc, char *argv[]){
 
     Listener listener;
 
-    thread listener_thread(listener, cref(is_end), ip, port);
+    thread listener_thread(listener, cref(is_end), ip, port,
+    ref(gpio_out_values), cref(gpio_inputs), cref(gpio_outputs));
 
     listener_thread.detach();
 

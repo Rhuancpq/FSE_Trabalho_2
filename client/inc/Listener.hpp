@@ -20,10 +20,14 @@
 using namespace std;
 
 #include "Messager.hpp"
+#include "Worker.hpp"
+#include "GPIO.hpp"
 
 class Listener {
 public:
-    void operator()(const bool & is_end, string ip, int port);
+    void operator()(const bool & is_end, string ip, int port,
+    unordered_map<string, int> & gpio_out_values,
+    const vector<GPIO_Pin> & in_gpios, const vector<GPIO_Pin> & out_gpios);
 };
 
 #endif // __LISTENER_HPP__
