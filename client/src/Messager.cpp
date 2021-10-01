@@ -63,5 +63,6 @@ int send_message(cJSON *message) {
 
     // close socket
     close(sockfd);
+    cJSON_Delete(message);
     return n;
 }

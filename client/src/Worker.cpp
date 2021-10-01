@@ -23,7 +23,7 @@ unordered_map<string, int> & gpio_out_values) {
         return;
     }
     // if type is action apply to gpio_out
-    if (cJSON_GetObjectItem(root, "type")->valuestring == "action") {
+    if (string(cJSON_GetObjectItem(root, "type")->valuestring) == "action") {
         cJSON * action = cJSON_GetObjectItem(root, "action");
         // get tag and value
         string tag = cJSON_GetObjectItem(action, "tag")->valuestring;

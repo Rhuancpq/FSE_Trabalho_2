@@ -12,11 +12,11 @@ int is_ready(int fd) {
   return select(fd+1, &fdset, NULL, NULL, &timeout) == 1;
 }
 
-cJSON * create_init_message(string ip, int port, 
+cJSON * create_init_message(string name, int port, 
 const vector<GPIO_Pin> & inputs, const vector<GPIO_Pin> & outputs) {
     cJSON * init_message = cJSON_CreateObject();
     cJSON_AddStringToObject(init_message, "type", "init");
-    cJSON_AddStringToObject(init_message, "ip", ip.c_str());
+    cJSON_AddStringToObject(init_message, "name", name.c_str());
     cJSON_AddNumberToObject(init_message, "port", port);
     // inputs
     cJSON * inputs_array = cJSON_CreateArray();
@@ -39,15 +39,15 @@ const vector<GPIO_Pin> & inputs, const vector<GPIO_Pin> & outputs) {
     return init_message;
 }
 
-cJSON * create_leave_message(string ip, int port) {
+cJSON * create_leave_message(string name, int port) {
     cJSON * leave_message = cJSON_CreateObject();
     cJSON_AddStringToObject(leave_message, "type", "leave");
-    cJSON_AddStringToObject(leave_message, "ip", ip.c_str());
+    cJSON_AddStringToObject(leave_message, "name", name.c_str());
     cJSON_AddNumberToObject(leave_message, "port", port);
     return leave_message;
 }
 
-void Listener::operator()(const bool & is_end, string ip, int port,
+void Listener::operator()(const bool & is_end, string name, int port,
 unordered_map<string, int> & gpio_out_values, 
 const vector<GPIO_Pin> & in_gpios, const vector<GPIO_Pin> & out_gpios) {
     int sockfd;
@@ -58,7 +58,7 @@ const vector<GPIO_Pin> & in_gpios, const vector<GPIO_Pin> & out_gpios) {
         return;
     }
     memset((char *) &serv_addr, 0, sizeof(serv_addr));
-    set_server_addr(&serv_addr, ip.c_str(), to_string(port).c_str());
+    set_server_addr(&serv_addr, DEFAULT_IP, to_string(port).c_str());
     cout << "Iniciando servidor distribuído no Ip: "
     << inet_ntoa(serv_addr.sin_addr)
     << " na porta: " << port << endl;
@@ -69,7 +69,8 @@ const vector<GPIO_Pin> & in_gpios, const vector<GPIO_Pin> & out_gpios) {
 
     listen(sockfd, 5);
 
-    cJSON * init_message = create_init_message(ip, port, in_gpios, out_gpios);
+    cJSON * init_message = create_init_message(name, port, in_gpios, out_gpios);
+    // TODO Se der erro criar task pra tentar novamente a cada 10 segundos
     send_message(init_message);
     cJSON_Delete(init_message);
 
@@ -92,7 +93,7 @@ const vector<GPIO_Pin> & in_gpios, const vector<GPIO_Pin> & out_gpios) {
         this_thread::sleep_for(50ms);
     }
 
-    cJSON * leave_message = create_leave_message(ip, port);
+    cJSON * leave_message = create_leave_message(name, port);
     send_message(leave_message);
     cJSON_Delete(leave_message);
 

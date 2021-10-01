@@ -66,6 +66,7 @@ int main(int argc, char *argv[]){
     cJSON *config = cJSON_Parse(config_str.c_str());
     string ip = cJSON_GetObjectItem(config, "ip")->valuestring;
     int port = cJSON_GetObjectItem(config, "porta")->valueint;
+    int server_port = cJSON_GetObjectItem(config, "porta_servidor")->valueint;
     string name = cJSON_GetObjectItem(config, "nome")->valuestring;
     vector<GPIO_Pin> gpio_inputs = get_gpio_info(config, "inputs");
     vector<GPIO_Pin> gpio_outputs = get_gpio_info(config, "outputs");
@@ -78,12 +79,12 @@ int main(int argc, char *argv[]){
     
     cJSON_Delete(config);
 
-    // TODO change server address
-    // server_addr = "";
+    server_addr = ip;
+    ::server_port = server_port;
 
     Listener listener;
 
-    thread listener_thread(listener, cref(is_end), ip, port,
+    thread listener_thread(listener, cref(is_end), name, port,
     ref(gpio_out_values), cref(gpio_inputs), cref(gpio_outputs));
 
     listener_thread.detach();
