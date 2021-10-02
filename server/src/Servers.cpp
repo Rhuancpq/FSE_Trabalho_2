@@ -8,6 +8,7 @@ Servers::Servers(){
 }
 
 Servers::~Servers(){
+    this->servers_mtx.~mutex();
 }
 
 Servers* Servers::getInstance(){
@@ -26,11 +27,15 @@ void Servers::destroyInstance(){
 }
 
 void Servers::addServer(const DistServers & server){
+    this->servers_mtx.lock();
     this->servers[server.name] = server;
+    this->servers_mtx.unlock();
 }
 
 void Servers::removeServer(const string & name){
+    this->servers_mtx.lock();
     this->servers.erase(name);
+    this->servers_mtx.unlock();
 }
 
 DistServers Servers::getServer(const std::string & name){
@@ -46,6 +51,7 @@ vector<DistServers> Servers::getServers() {
 }
 
 void Servers::updateData(const string & name, Data data){
+    this->servers_mtx.lock();
     auto it_in = find_if(this->servers[name].in_data.begin(), 
     this->servers[name].in_data.end(),
     [&](const Data &d) { return d.tag == data.tag and d.type == data.type; });
@@ -59,10 +65,13 @@ void Servers::updateData(const string & name, Data data){
     if(it_out != this->servers[name].out_data.end()){
         it_out->value = data.value;
     }
+    this->servers_mtx.unlock();
 }
 
 void Servers::updateTemperature(const string & name, 
 const double & temperature, const double & humidity) {
+    this->servers_mtx.lock();
     this->servers[name].temperature = temperature;
     this->servers[name].humidity = humidity;
+    this->servers_mtx.unlock();
 }

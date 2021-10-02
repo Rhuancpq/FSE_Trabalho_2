@@ -3,6 +3,7 @@
 
 #include <unordered_map>
 #include <algorithm>
+#include <mutex>
 using namespace std;
 
 #include "Types.hpp"
@@ -23,7 +24,7 @@ private:
     Servers();
     ~Servers();    
     static Servers* instance;
-    // not thread safe, TODO use mutex
+    mutex servers_mtx;
     unordered_map<string, DistServers> servers;
 };
 
