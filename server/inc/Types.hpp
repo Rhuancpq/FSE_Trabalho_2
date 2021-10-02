@@ -10,9 +10,12 @@ typedef struct Data {
     bool value;
 } Data;
 
+bool operator==(const Data& lhs, const Data& rhs);
+
 typedef struct DistServers {
     string ip, name;
     int port;
+    double temperature, humidity;
     vector<Data> in_data, out_data;
 } DistServers;
 

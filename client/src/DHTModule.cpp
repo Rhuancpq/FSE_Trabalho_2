@@ -19,7 +19,8 @@ void DHTModule::operator()(bool & is_end) {
         // type data 
         cJSON_AddStringToObject(json, "type", "data");
         cJSON * data = cJSON_CreateObject();
-        cJSON_AddStringToObject(data, "tag", "temperature");
+        cJSON_AddStringToObject(data, "type", "temperature");
+        cJSON_AddStringToObject(data, "tag", "DHT - Sensor");
         cJSON_AddNumberToObject(data, "temperature", temp_cels);
         cJSON_AddNumberToObject(data, "humidity", humidity);
         cJSON_AddItemToObject(json, "data", data);

@@ -15,6 +15,7 @@ using namespace std;
 int send_message(cJSON *message);
 extern string server_addr;
 extern int server_port;
+extern string dist_name;
 void set_server_addr(struct sockaddr_in * serv_addr, const char * addr, const char * port);
 
 

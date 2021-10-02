@@ -18,6 +18,7 @@ using namespace std;
 #include "cJSON.h"
 #include "Types.hpp"
 #include "Router.hpp"
+#include "Interface.hpp"
 
 int sockfd;
 
@@ -84,6 +85,12 @@ int main(int argc, char *argv[]){
     }
     
     listen(sockfd, 5);
+
+    Interface interface;
+
+    thread interface_thread(interface);
+
+    interface_thread.detach();
 
     while(true){
         // accept connections and print to stdout

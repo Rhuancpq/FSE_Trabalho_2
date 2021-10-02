@@ -7,6 +7,7 @@
 #include <signal.h>
 #include <unordered_map>
 #include <thread>
+#include <future>
 using namespace std;
 
 #include "DHTModule.hpp"
@@ -81,6 +82,7 @@ int main(int argc, char *argv[]){
 
     server_addr = ip;
     ::server_port = server_port;
+    dist_name = name;
 
     Listener listener;
 
@@ -109,7 +111,8 @@ int main(int argc, char *argv[]){
         gpio_out_thread.detach();
     }
 
-    sleep(30);
+    promise<void> p;
+    p.get_future().wait();
 
     return 0;
 }

@@ -16,6 +16,7 @@ void Router::init() {
         Data d;
         d.type = cJSON_GetObjectItem(data, "type")->valuestring;
         d.tag = cJSON_GetObjectItem(data, "tag")->valuestring;
+        d.value = 0;
         dist_server.in_data.push_back(d);
     }
     for(int i = 0; i < cJSON_GetArraySize(out_data); i++){
@@ -23,6 +24,7 @@ void Router::init() {
         Data d;
         d.type = cJSON_GetObjectItem(data, "type")->valuestring;
         d.tag = cJSON_GetObjectItem(data, "tag")->valuestring;
+        d.value = 0;
         dist_server.out_data.push_back(d);
     }
     cout << "O servidor distribuído " << dist_server.name 
@@ -32,7 +34,25 @@ void Router::init() {
 }
 
 void Router::data() {
-    // TODO
+    string server_name = cJSON_GetObjectItem(request, "server_name")->valuestring;
+    cJSON * data = cJSON_GetObjectItem(request, "data");
+    Servers * server = Servers::getInstance();
+    Data req_data;
+    req_data.type = cJSON_GetObjectItem(data, "type")->valuestring;
+    req_data.tag = cJSON_GetObjectItem(data, "tag")->valuestring;
+    
+    if (req_data.type == "contagem") {
+        req_data.value = cJSON_GetObjectItem(data, "value")->valueint;
+    } else if (req_data.type == "temperature") {
+        double temperature = cJSON_GetObjectItem(data, "temperature")->valuedouble;
+        double humidity = cJSON_GetObjectItem(data, "humidity")->valuedouble;
+        server->updateTemperature(server_name, temperature, humidity);
+        return;
+    } else {
+        cJSON * state = cJSON_GetObjectItem(data, "state");
+        req_data.value = cJSON_IsTrue(state) ? 1 : 0;
+    }
+    server->updateData(server_name, req_data);
 }
 
 void Router::leave() {

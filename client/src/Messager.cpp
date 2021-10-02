@@ -1,5 +1,6 @@
 #include "Messager.hpp"
 
+string dist_name = "";
 string server_addr = "localhost";
 int server_port = 10025;
 
@@ -50,6 +51,9 @@ int send_message(cJSON *message) {
         cerr << "ERROR during connection" << endl;
         return -1;
     }
+
+    // add name to json
+    cJSON_AddStringToObject(message, "server_name", dist_name.c_str());
 
     // send message
     string message_str = cJSON_Print(message);
