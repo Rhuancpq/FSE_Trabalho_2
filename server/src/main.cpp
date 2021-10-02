@@ -12,9 +12,12 @@
 #include <cstring>
 #include <signal.h>
 #include <unordered_map>
+#include <thread>
 using namespace std;
 
 #include "cJSON.h"
+#include "Types.hpp"
+#include "Router.hpp"
 
 int sockfd;
 
@@ -55,16 +58,6 @@ int is_ready(int fd) {
   return select(fd+1, &fdset, NULL, NULL, &timeout) == 1;
 }
 
-typedef struct Data {
-    string type, tag;
-} Data;
-
-typedef struct DistServers {
-    string ip, name;
-    int port;
-    vector<Data> in_data, out_data;
-} DistServers;
-
 
 int main(int argc, char *argv[]){
     if (argc != 3) {
@@ -89,8 +82,6 @@ int main(int argc, char *argv[]){
         cout << "Error on binding" << endl;
         return 1;
     }
-
-    unordered_map<string, DistServers> servers;
     
     listen(sockfd, 5);
 
@@ -112,39 +103,17 @@ int main(int argc, char *argv[]){
             cout << "Error reading from socket" << endl;
             return 1;
         }
-        cout << "Recebido: " << buffer << endl;
         close(newsockfd);
-        // TODO - parse JSON
         cJSON * root = cJSON_Parse(buffer);
         if (root == NULL) {
             cout << "Error parsing JSON" << endl;
             return 1;
         }
-        if((string) cJSON_GetObjectItem(root, "type")->valuestring == "init"){
-            DistServers dist_server;
-            dist_server.ip = cJSON_GetObjectItem(root, "ip")->valuestring;
-            dist_server.name = cJSON_GetObjectItem(root, "name")->valuestring;
-            dist_server.port = cJSON_GetObjectItem(root, "port")->valueint;
-            cJSON * in_data = cJSON_GetObjectItem(root, "in_data");
-            cJSON * out_data = cJSON_GetObjectItem(root, "out_data");
-            for(int i = 0; i < cJSON_GetArraySize(in_data); i++){
-                cJSON * data = cJSON_GetArrayItem(in_data, i);
-                Data d;
-                d.type = cJSON_GetObjectItem(data, "type")->valuestring;
-                d.tag = cJSON_GetObjectItem(data, "tag")->valuestring;
-                dist_server.in_data.push_back(d);
-            }
-            for(int i = 0; i < cJSON_GetArraySize(out_data); i++){
-                cJSON * data = cJSON_GetArrayItem(out_data, i);
-                Data d;
-                d.type = cJSON_GetObjectItem(data, "type")->valuestring;
-                d.tag = cJSON_GetObjectItem(data, "tag")->valuestring;
-                dist_server.out_data.push_back(d);
-            }
-            servers[dist_server.name] = dist_server;
-        } else if((string) cJSON_GetObjectItem(root, "type")->valuestring == "leave"){
-            servers.erase(cJSON_GetObjectItem(root, "name")->valuestring);
-        }
+        string ip = inet_ntoa(cli_addr.sin_addr);
+        cJSON_AddStringToObject(root, "ip", ip.c_str());
+        Router * router = new Router(root);
+        thread * router_thread = new thread(&Router::filterRequest, router);
+        router_thread->detach();
     }
 
     close(sockfd);
