@@ -26,7 +26,6 @@ void DHTModule::operator()(bool & is_end) {
         if(send_message(json) < 0){
             cerr << "Error sending data to server" << endl;
         }
-        cJSON_Delete(json);
 
         this_thread::sleep_for(900ms);
 

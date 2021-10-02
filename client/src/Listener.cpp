@@ -72,7 +72,6 @@ const vector<GPIO_Pin> & in_gpios, const vector<GPIO_Pin> & out_gpios) {
     cJSON * init_message = create_init_message(name, port, in_gpios, out_gpios);
     // TODO Se der erro criar task pra tentar novamente a cada 10 segundos
     send_message(init_message);
-    cJSON_Delete(init_message);
 
     while (!is_end) {
         if (is_ready(sockfd)) {
@@ -95,7 +94,6 @@ const vector<GPIO_Pin> & in_gpios, const vector<GPIO_Pin> & out_gpios) {
 
     cJSON * leave_message = create_leave_message(name, port);
     send_message(leave_message);
-    cJSON_Delete(leave_message);
 
     close(sockfd);
 }
