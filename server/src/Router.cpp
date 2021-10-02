@@ -30,7 +30,12 @@ void Router::init() {
     cout << "O servidor distribuído " << dist_server.name 
     << " foi inserido." << endl;
     Servers * server = Servers::getInstance();
-    server->addServer(dist_server);
+    if(server->hasServer(dist_server.name)){
+        cout << "O servidor distribuído com esse nome " << dist_server.name 
+        << " já existe." << endl;
+    } else {
+        server->addServer(dist_server);
+    }
 }
 
 void Router::data() {

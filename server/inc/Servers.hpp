@@ -17,6 +17,7 @@ public:
     void removeServer(const string & name);
     DistServers getServer(const string& name);
     vector<DistServers> getServers();
+    bool hasServer(const string& name);
     void updateTemperature(const string & name, 
     const double & temperature, const double & humidity);
     void updateData(const string& name, Data data);

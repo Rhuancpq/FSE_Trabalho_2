@@ -75,3 +75,9 @@ const double & temperature, const double & humidity) {
     this->servers[name].humidity = humidity;
     this->servers_mtx.unlock();
 }
+
+bool Servers::hasServer(const string& name) {
+    this->servers_mtx.lock();
+    return this->servers.find(name) != this->servers.end();
+    this->servers_mtx.unlock();
+}
