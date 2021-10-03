@@ -20,6 +20,7 @@ using namespace std;
 #include "Router.hpp"
 #include "RouterSem.hpp"
 #include "Interface.hpp"
+#include "Control.hpp"
 
 int sockfd;
 
@@ -94,6 +95,12 @@ int main(int argc, char *argv[]){
     thread interface_thread(interface);
 
     interface_thread.detach();
+
+    Control * control = new Control();
+
+    thread control_thread(&Control::init_control, control);
+
+    control_thread.detach();
 
     while(true){
         // accept connections and print to stdout

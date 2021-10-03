@@ -19,4 +19,10 @@ typedef struct DistServers {
     vector<Data> in_data, out_data;
 } DistServers;
 
+typedef struct Event {
+    Data data;
+    DistServers origin;
+    int priority;
+} Event;
+
 #endif

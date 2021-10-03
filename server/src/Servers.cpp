@@ -67,6 +67,11 @@ void Servers::updateData(const string & name, Data data){
     if(it_out != this->servers[name].out_data.end()){
         it_out->value = data.value;
     }
+
+    // TODO Handle priority
+    Event e = {data, this->servers[name], 0};
+    EventQueue * eq = EventQueue::getInstance();
+    eq->push(e);
 }
 
 void Servers::updateTemperature(const string & name, 

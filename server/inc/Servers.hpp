@@ -8,6 +8,7 @@
 using namespace std;
 
 #include "Types.hpp"
+#include "EventQueue.hpp"
 
 // this is a singleton class
 class Servers {
