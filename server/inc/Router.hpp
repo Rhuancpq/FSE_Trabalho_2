@@ -9,8 +9,9 @@ using namespace std;
 #include "cJSON.h"
 #include "Types.hpp"
 #include "Servers.hpp"
+#include "RouterSem.hpp"
 
-static unordered_set<string> VALID_TYPES = {"init", "leave", "data"}; 
+static unordered_set<string> VALID_TYPES = {"init", "leave", "data"};
 
 class Router {
 public:

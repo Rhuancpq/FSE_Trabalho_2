@@ -4,6 +4,7 @@ void Interface::operator()(void) {
     while(true) {
         Servers * s = Servers::getInstance();
         vector<DistServers> all_states = s->getServers();
+        cout << "Quantidade de servidores: " << all_states.size() << endl;
         for(auto & state : all_states) {
             cout << "Servidor Distribuido: " << state.name << endl;
             cout << "Estados: " << endl;

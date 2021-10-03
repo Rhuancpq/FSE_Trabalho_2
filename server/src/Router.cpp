@@ -27,8 +27,6 @@ void Router::init() {
         d.value = 0;
         dist_server.out_data.push_back(d);
     }
-    cout << "O servidor distribuído " << dist_server.name 
-    << " foi inserido." << endl;
     Servers * server = Servers::getInstance();
     if(server->hasServer(dist_server.name)){
         cout << "O servidor distribuído com esse nome " << dist_server.name 
@@ -36,6 +34,8 @@ void Router::init() {
     } else {
         server->addServer(dist_server);
     }
+    cout << "O servidor distribuído " << dist_server.name 
+    << " foi inserido." << endl;
 }
 
 void Router::data() {
@@ -80,4 +80,6 @@ void Router::filterRequest() {
     } else if (type == "leave") {
         leave();
     }
+    cout << "Request processed" << endl;
+    RouterSem::release();
 }

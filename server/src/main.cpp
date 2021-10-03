@@ -18,6 +18,7 @@ using namespace std;
 #include "cJSON.h"
 #include "Types.hpp"
 #include "Router.hpp"
+#include "RouterSem.hpp"
 #include "Interface.hpp"
 
 int sockfd;
@@ -86,6 +87,8 @@ int main(int argc, char *argv[]){
     
     listen(sockfd, 5);
 
+    RouterSem::init();
+
     Interface interface;
 
     thread interface_thread(interface);
@@ -118,6 +121,7 @@ int main(int argc, char *argv[]){
         }
         string ip = inet_ntoa(cli_addr.sin_addr);
         cJSON_AddStringToObject(root, "ip", ip.c_str());
+        RouterSem::acquire();
         Router * router = new Router(root);
         thread * router_thread = new thread(&Router::filterRequest, router);
         router_thread->detach();

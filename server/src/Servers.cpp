@@ -27,15 +27,13 @@ void Servers::destroyInstance(){
 }
 
 void Servers::addServer(const DistServers & server){
-    this->servers_mtx.lock();
+    lock_guard<mutex> lock(this->servers_mtx);
     this->servers[server.name] = server;
-    this->servers_mtx.unlock();
 }
 
 void Servers::removeServer(const string & name){
-    this->servers_mtx.lock();
+    lock_guard<mutex> lock(this->servers_mtx);
     this->servers.erase(name);
-    this->servers_mtx.unlock();
 }
 
 DistServers Servers::getServer(const std::string & name){
@@ -43,15 +41,19 @@ DistServers Servers::getServer(const std::string & name){
 }
 
 vector<DistServers> Servers::getServers() {
-    vector<DistServers> servers;
-    for(auto it = this->servers.begin(); it != this->servers.end(); it++){
-        servers.push_back(it->second);
+    vector<DistServers> res;
+    if(this->servers.size() > 0) {
+        lock_guard<mutex> lock(this->servers_mtx);
+
+        for(auto it = this->servers.begin(); it != this->servers.end(); it++){
+            res.push_back(it->second);
+        }
     }
-    return servers;
+    return res;
 }
 
 void Servers::updateData(const string & name, Data data){
-    this->servers_mtx.lock();
+    lock_guard<mutex> lock(this->servers_mtx);
     auto it_in = find_if(this->servers[name].in_data.begin(), 
     this->servers[name].in_data.end(),
     [&](const Data &d) { return d.tag == data.tag and d.type == data.type; });
@@ -65,19 +67,16 @@ void Servers::updateData(const string & name, Data data){
     if(it_out != this->servers[name].out_data.end()){
         it_out->value = data.value;
     }
-    this->servers_mtx.unlock();
 }
 
 void Servers::updateTemperature(const string & name, 
 const double & temperature, const double & humidity) {
-    this->servers_mtx.lock();
+    lock_guard<mutex> lock(this->servers_mtx);
     this->servers[name].temperature = temperature;
     this->servers[name].humidity = humidity;
-    this->servers_mtx.unlock();
 }
 
 bool Servers::hasServer(const string& name) {
-    this->servers_mtx.lock();
+    lock_guard<mutex> lock(this->servers_mtx);
     return this->servers.find(name) != this->servers.end();
-    this->servers_mtx.unlock();
 }
