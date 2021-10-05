@@ -3,10 +3,14 @@
 
 #include "EventQueue.hpp"
 #include "Types.hpp"
+#include "Servers.hpp"
+#include "Messager.hpp"
 
 #include <thread>
 #include <iostream>
 using namespace std;
+
+extern int people_count;
 
 class Control {
 private:
