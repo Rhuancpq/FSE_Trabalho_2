@@ -23,6 +23,11 @@
       "type": "ar-condicionado",
       "tag": "Ar-Condicionado (1º Andar)",
       "gpio": 12
+    },
+    {
+      "type": "aspersor",
+      "tag": "Aspersor de Água (Incêndio)",
+      "gpio": 16
     }
   ],
   "inputs": [
