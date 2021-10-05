@@ -2,11 +2,11 @@
 
 sem_t thread_sem;
 
-void init() {
+void messager_sem_init() {
     sem_init(&thread_sem, 0, 5);
 }
 
-int send_message(string ip, int port, cJSON * message) {
+int send_message(string ip, int port, string message) {
     // open socket and send message
     int sockfd;
     struct sockaddr_in serv_addr;
@@ -33,7 +33,7 @@ int send_message(string ip, int port, cJSON * message) {
         return -1;
     }
     // send message
-    char * message_str = cJSON_Print(message);
+    const char * message_str = message.c_str();
     int n = write(sockfd,message_str,strlen(message_str));
     if (n < 0) {
         cerr << "ERROR writing to socket" << endl;
@@ -70,6 +70,8 @@ int send_message(string ip, int port, cJSON * message) {
 void send_message_async(string ip, int port, cJSON * message) {
     // lock semaphore
     sem_wait(&thread_sem);
+    cout << "Sending Message to Server: " << ip << ":" << port << endl;
     // create thread to send message
-    thread(send_message, ip, port, ref(message)).detach();
+    string message_str = cJSON_Print(message);
+    thread(send_message, ip, port, message_str).detach();
 }

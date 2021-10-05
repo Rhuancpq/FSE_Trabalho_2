@@ -18,6 +18,7 @@ using namespace std;
 
 #include "cJSON.h"
 
+void messager_sem_init();
 void send_message_async(string ip, int port, cJSON * message);
 
 #endif

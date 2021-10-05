@@ -21,10 +21,11 @@ using namespace std;
 #include "RouterSem.hpp"
 #include "Interface.hpp"
 #include "Control.hpp"
+#include "Messager.hpp"
 
 int sockfd;
 
-#define MAX_BUFFER_SIZE 1024
+#define MAX_BUFFER_SIZE 2048
 
 void set_server_addr(struct sockaddr_in * serv_addr, char * addr, char * port) {
   int errcode;
@@ -89,6 +90,7 @@ int main(int argc, char *argv[]){
     listen(sockfd, 5);
 
     RouterSem::init();
+    messager_sem_init();
 
     Interface interface;
 

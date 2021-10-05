@@ -30,15 +30,13 @@ void Control::handle_event_smoke(Event event){
         Servers * servers = Servers::getInstance();
         vector<DistServers> dist_servers = servers->getServers();
         for(auto & dist_server : dist_servers) {
-            auto it = find_if(dist_server.out_data.begin(), dist_server.out_data.end(), [](const Data & data) {
-                return data.type == "aspersor";
-            });
-
-            if(it != dist_server.out_data.end()) {
-                it->value = true;
-                cJSON * request = mount_action(it->tag, 1);
-                send_message_async(dist_server.ip, dist_server.port, request);
+            for(auto & out_data : dist_server.out_data) {
+                if(out_data.type == "aspersor") {
+                    cJSON * request = mount_action(out_data.tag, 1);
+                    send_message_async(dist_server.ip, dist_server.port, request);
+                }
             }
+
         }
     }
 }
@@ -73,7 +71,6 @@ void Control::init_control() {
         EventQueue * event_queue = EventQueue::getInstance();
         while(event_queue->size() > 0) {
             Event event = event_queue->pop();
-            cout << "Event: " << event.data.type << endl;
             if(event.data.type == "fumaca"){
                 this->handle_event_smoke(event);
             }else if(event.data.type == "porta" or
