@@ -78,6 +78,7 @@ void Interface::operator()(bool & is_running) {
             
             // use instructions
             attron(COLOR_PAIR(3));
+            mvprintw(max_y - 3, 3, "Use os números de 1 a 9 para alterar manualmente as saídas do servidor atual...");
             mvprintw(max_y - 2, 3, "Use as setas (<- e ->) para alternar entre os servidores");
             mvprintw(max_y - 1, 3, "Use F1 para sair");
             attroff(COLOR_PAIR(3));
@@ -135,7 +136,7 @@ void Interface::operator()(bool & is_running) {
             } else if(ch == KEY_F(1)){
                 break;
             } else if(isdigit(c) and (c - '0') < (current_server.out_data.size()+1)) {
-                mvprintw(max_y - 3, 3, "Output (%c) alterado manualmente!", c);
+                mvprintw(max_y - 4, 3, "Output (%c) alterado manualmente!", c);
                 Data current_state = current_server.out_data[c - '1'];
                 Data new_state = {"action", current_state.tag, !current_state.value};
                 Event e = {new_state, current_server, 0};
