@@ -18,6 +18,7 @@ using namespace std;
 #include "Servers.hpp"
 #include "Types.hpp"
 #include "EventQueue.hpp"
+#include "Control.hpp"
 
 class Interface{
 public:

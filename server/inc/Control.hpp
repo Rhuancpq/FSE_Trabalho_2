@@ -26,6 +26,7 @@ public:
     void static stop_all();
     void init_control();
     void static update_alarm(bool is_alarm_on);
+    bool static get_alarm_status();
 };
 
 #endif // __CONTROL_HPP__

@@ -13,6 +13,10 @@ void Control::update_alarm(bool is_alarm_on) {
     Control::is_alarm_on = is_alarm_on;
 }
 
+bool Control::get_alarm_status() {
+    return is_alarm_on;
+}
+
 cJSON * mount_action (string tag, int value) {
     cJSON * request = cJSON_CreateObject();
     cJSON_AddStringToObject(request, "type", "action");

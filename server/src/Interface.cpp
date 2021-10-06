@@ -72,7 +72,11 @@ void Interface::operator()(bool & is_running) {
 
             string info2 = "IP: " + current_server.ip + " | porta: " + to_string(current_server.port);
 
+            stringstream alarm_info; 
+            alarm_info << "Alarme: " << (Control::get_alarm_status() ? "Ligado" : "Desligado");
+
             mvprintw(0, max_x - info3.str().length(), info3.str().c_str());
+            mvprintw(1, max_x - alarm_info.str().length(), alarm_info.str().c_str());
             mvprintw(0, 1, info2.c_str());
             mvprintw(0, max_x/2 - server_header.str().length()/2, server_header.str().c_str());
             
@@ -80,7 +84,7 @@ void Interface::operator()(bool & is_running) {
             attron(COLOR_PAIR(3));
             mvprintw(max_y - 3, 3, "Use os números de 1 a 9 para alterar manualmente as saídas do servidor atual...");
             mvprintw(max_y - 2, 3, "Use as setas (<- e ->) para alternar entre os servidores");
-            mvprintw(max_y - 1, 3, "Use F1 para sair");
+            mvprintw(max_y - 1, 3, "Use F2 para alternar o alarme, F1 para sair");
             attroff(COLOR_PAIR(3));
             refresh();
 
@@ -135,6 +139,9 @@ void Interface::operator()(bool & is_running) {
                 werase(win_left);
             } else if(ch == KEY_F(1)){
                 break;
+            } else if(ch == KEY_F(2)){
+                Control::update_alarm(Control::get_alarm_status() ? false : true);
+                werase(win_right);
             } else if(isdigit(c) and (c - '0') < (current_server.out_data.size()+1)) {
                 mvprintw(max_y - 4, 3, "Output (%c) alterado manualmente!", c);
                 Data current_state = current_server.out_data[c - '1'];
