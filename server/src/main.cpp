@@ -89,12 +89,22 @@ int main(int argc, char *argv[]){
     
     listen(sockfd, 5);
 
+    bool is_running = true;
+
     RouterSem::init();
     messager_sem_init();
 
+    // create main log file
+    string filename = "exec_log_" + to_string(time(0)) + ".log";
+    ofstream log_file(filename);
+
+    // change cerr and cout to use file instead of stdout
+    cerr.rdbuf(log_file.rdbuf());
+    cout.rdbuf(log_file.rdbuf());
+
     Interface interface;
 
-    thread interface_thread(interface);
+    thread interface_thread(interface, ref(is_running));
 
     interface_thread.detach();
 
@@ -104,10 +114,11 @@ int main(int argc, char *argv[]){
 
     control_thread.detach();
 
-    while(true){
+    while(is_running){
         // accept connections and print to stdout
         struct sockaddr_in cli_addr;
         socklen_t clilen = sizeof(cli_addr);
+        if(!is_ready(sockfd)) continue; 
         int newsockfd = accept(sockfd, (struct sockaddr *) &cli_addr, &clilen);
         if (newsockfd < 0) {
             cout << "Error on accept" << endl;

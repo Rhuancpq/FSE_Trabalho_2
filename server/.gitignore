@@ -36,3 +36,4 @@ bin/*
 !bin/.placeholder
 
 log_*.csv
+*.log

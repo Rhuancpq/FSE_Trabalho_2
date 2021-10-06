@@ -1,8 +1,17 @@
 #ifndef __INTERFACE_HPP__
 #define __INTERFACE_HPP__
 
+#include <curses.h>
+#include <menu.h>
+#include <cstring>
+#include <cstdlib>
+#include <string>
+#include <vector>
+#include <sstream>
+#include <iomanip>
+#include <algorithm>
 #include <thread>
-#include <iostream>
+#include <chrono>
 using namespace std;
 
 #include "Servers.hpp"
@@ -10,7 +19,7 @@ using namespace std;
 
 class Interface{
 public:
-    void operator()(void);
+    void operator()(bool & is_running);
 };
 
 #endif // __INTERFACE_HPP__
