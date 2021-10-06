@@ -1,5 +1,7 @@
 #include "Interface.hpp"
 
+set<int> CODES = {};
+
 void Interface::operator()(bool & is_running) {
     // init ncurses
     initscr();
@@ -18,7 +20,8 @@ void Interface::operator()(bool & is_running) {
     getmaxyx(stdscr, max_y, max_x);
     int win_l_y = max_y / 2 - 3;
     int win_l_x = max_x / 2 - 20;
-    WINDOW *win = newwin(win_l_y, win_l_x, (max_y - win_l_y)/2, 1);
+    WINDOW *win_left = newwin(win_l_y, win_l_x, (max_y - win_l_y)/2, 1);
+    WINDOW *win_right = newwin(win_l_y, win_l_x, (max_y - win_l_y)/2, max_x - win_l_x - 1);
 
     int current_server_index = 0;
     int server_num = 0;
@@ -54,6 +57,7 @@ void Interface::operator()(bool & is_running) {
                 break;
             }
         } else {
+            first_time_empty = false;
             DistServers current_server = all_states[current_server_index%server_num];
             // create menu
             stringstream server_header;
@@ -80,35 +84,63 @@ void Interface::operator()(bool & is_running) {
             refresh();
 
             // TODO position data on vertical center of window
-            werase(win);
-            box(win, 0, 0);
+            werase(win_left);
+            box(win_left, 0, 0);
             for(int i = 0; i < current_server.in_data.size(); i++){
-                mvwprintw(win, i+2, 2, current_server.in_data[i].tag.c_str());
+                
+                mvwprintw(win_left, i+2, 2, current_server.in_data[i].tag.c_str());
                 if(current_server.in_data[i].value){
-                    wattron(win, COLOR_PAIR(1));
-                    mvwprintw(win, i+2, win_l_x - 4, "On");
-                    wattroff(win, COLOR_PAIR(1));
+                    wattron(win_left, COLOR_PAIR(1));
+                    mvwprintw(win_left, i+2, win_l_x - 4, "On");
+                    wattroff(win_left, COLOR_PAIR(1));
                 } else {
-                    wattron(win, COLOR_PAIR(2));
-                    mvwprintw(win, i+2, win_l_x - 5, "Off");
-                    wattroff(win, COLOR_PAIR(2));
+                    wattron(win_left, COLOR_PAIR(2));
+                    mvwprintw(win_left, i+2, win_l_x - 5, "Off");
+                    wattroff(win_left, COLOR_PAIR(2));
                 }
             }
-            wrefresh(win);
+            wrefresh(win_left);
+
+            werase(win_right);
+            box(win_right, 0, 0);
+            for(int i = 0; i < current_server.out_data.size(); i++){
+                stringstream tag_prefix;
+                tag_prefix << "(" << i + 1 << ") "
+                << current_server.out_data[i].tag;
+                mvwprintw(win_right, i+2, 2, tag_prefix.str().c_str());
+                if(current_server.out_data[i].value){
+                    wattron(win_right, COLOR_PAIR(1));
+                    mvwprintw(win_right, i+2, win_l_x - 4, "On");
+                    wattroff(win_right, COLOR_PAIR(1));
+                } else {
+                    wattron(win_right, COLOR_PAIR(2));
+                    mvwprintw(win_right, i+2, win_l_x - 5, "Off");
+                    wattroff(win_right, COLOR_PAIR(2));
+                }
+            }
+            wrefresh(win_right);
 
             int ch = getch();
+            char c = ch;
             if(ch == KEY_LEFT){
                 current_server_index--;
                 if(current_server_index < 0)
                     current_server_index = server_num - 1;
-                werase(win);
+                werase(win_left);
             } else if(ch == KEY_RIGHT){
                 current_server_index++;
                 if(current_server_index >= server_num)
                     current_server_index = 0;
-                werase(win);
+                werase(win_left);
             } else if(ch == KEY_F(1)){
                 break;
+            } else if(isdigit(c) and (c - '0') < (current_server.out_data.size()+1)) {
+                mvprintw(max_y - 3, 3, "Output (%c) alterado manualmente!", c);
+                Data current_state = current_server.out_data[c - '1'];
+                Data new_state = {"action", current_state.tag, !current_state.value};
+                Event e = {new_state, current_server, 0};
+                EventQueue * eq = EventQueue::getInstance();
+                eq->push(e);
             }
             
         }
@@ -116,7 +148,7 @@ void Interface::operator()(bool & is_running) {
         this_thread::sleep_for(10ms);
     } 
 
-    delwin(win);
+    delwin(win_left);
     endwin();
     is_running = false;
 }

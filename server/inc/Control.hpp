@@ -19,6 +19,7 @@ private:
     void handle_event_smoke(Event event);
     void handle_event_presence(Event event);
     void handle_event_count(Event event);
+    void handle_event_action(Event event);
 public:
     Control(){};
     ~Control(){};

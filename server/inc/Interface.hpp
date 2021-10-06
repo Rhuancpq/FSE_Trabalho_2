@@ -10,12 +10,14 @@
 #include <sstream>
 #include <iomanip>
 #include <algorithm>
+#include <set>
 #include <thread>
 #include <chrono>
 using namespace std;
 
 #include "Servers.hpp"
 #include "Types.hpp"
+#include "EventQueue.hpp"
 
 class Interface{
 public:

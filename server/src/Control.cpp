@@ -33,12 +33,25 @@ void Control::handle_event_smoke(Event event){
             for(auto & out_data : dist_server.out_data) {
                 if(out_data.type == "aspersor") {
                     cJSON * request = mount_action(out_data.tag, 1);
+                    servers->updateData(dist_server.name, {out_data.type, out_data.tag, true});
                     send_message_async(dist_server.ip, dist_server.port, request);
                 }
             }
 
         }
     }
+}
+
+// receives type as "action" 
+void Control::handle_event_action(Event event) {
+    cJSON * request = mount_action(event.data.tag, event.data.value);
+    Servers * servers = Servers::getInstance();
+    for(auto & data : event.origin.out_data) {
+        if(data.tag == event.data.tag) {
+            servers->updateData(event.origin.name, {data.type, data.tag, event.data.value});
+        }
+    }
+    send_message_async(event.origin.ip, event.origin.port, request);
 }
 
 void Control::handle_event_presence(Event event){
@@ -53,6 +66,8 @@ void Control::handle_event_presence(Event event){
         }
 
         cJSON * request = mount_action(data.tag, event.data.value);
+        Servers * servers = Servers::getInstance();
+        servers->updateData(event.origin.name, {data.type, data.tag, event.data.value});
         send_message_async(event.origin.ip, event.origin.port, request);
     }
 }
@@ -79,6 +94,8 @@ void Control::init_control() {
                 this->handle_event_presence(event);
             }else if(event.data.type == "contagem") {
                 this->handle_event_count(event);
+            }else if(event.data.type == "action") {
+                this->handle_event_action(event);
             }
         }
 
