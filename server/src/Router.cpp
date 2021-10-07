@@ -16,7 +16,7 @@ void Router::init() {
         Data d;
         d.type = cJSON_GetObjectItem(data, "type")->valuestring;
         d.tag = cJSON_GetObjectItem(data, "tag")->valuestring;
-        d.value = 0;
+        d.value = false;
         dist_server.in_data.push_back(d);
     }
     for(int i = 0; i < cJSON_GetArraySize(out_data); i++){
@@ -24,7 +24,7 @@ void Router::init() {
         Data d;
         d.type = cJSON_GetObjectItem(data, "type")->valuestring;
         d.tag = cJSON_GetObjectItem(data, "tag")->valuestring;
-        d.value = 0;
+        d.value = false;
         dist_server.out_data.push_back(d);
     }
     Servers * server = Servers::getInstance();
@@ -55,7 +55,7 @@ void Router::data() {
         return;
     } else {
         cJSON * state = cJSON_GetObjectItem(data, "state");
-        req_data.value = cJSON_IsTrue(state) ? 1 : 0;
+        req_data.value = cJSON_IsTrue(state) != 0;
     }
     server->updateData(server_name, req_data);
 }

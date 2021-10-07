@@ -1,7 +1,5 @@
 #include "Interface.hpp"
 
-set<int> CODES = {};
-
 void Interface::operator()(bool & is_running) {
     // init ncurses
     initscr();
@@ -140,7 +138,7 @@ void Interface::operator()(bool & is_running) {
             } else if(ch == KEY_F(1)){
                 break;
             } else if(ch == KEY_F(2)){
-                Control::update_alarm(Control::get_alarm_status() ? false : true);
+                Control::update_alarm(!Control::get_alarm_status());
                 werase(win_right);
             } else if(isdigit(c) and (c - '0') < (current_server.out_data.size()+1)) {
                 mvprintw(max_y - 4, 3, "Output (%c) alterado manualmente!", c);

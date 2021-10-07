@@ -5,13 +5,11 @@
 #include <streambuf>
 #include <sys/socket.h>
 #include <arpa/inet.h>
-#include <netinet/in.h>
 #include <netdb.h>
 #include <unistd.h>
 #include <cstdio>
 #include <cstring>
 #include <signal.h>
-#include <unordered_map>
 #include <thread>
 using namespace std;
 
@@ -45,7 +43,7 @@ void set_server_addr(struct sockaddr_in * serv_addr, char * addr, char * port) {
   }
 
   serv_addr->sin_family = AF_INET;
-  struct sockaddr_in * temp_addr = (struct sockaddr_in *) result->ai_addr;
+  auto * temp_addr = (struct sockaddr_in *) result->ai_addr;
   serv_addr->sin_addr = temp_addr->sin_addr; 
   serv_addr->sin_port = htons(atoi(port));
 }
@@ -146,6 +144,8 @@ int main(int argc, char *argv[]){
         thread * router_thread = new thread(&Router::filterRequest, router);
         router_thread->detach();
     }
+
+    Control::stop_all();
 
     close(sockfd);
 

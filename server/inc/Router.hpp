@@ -16,7 +16,7 @@ static unordered_set<string> VALID_TYPES = {"init", "leave", "data"};
 class Router {
 public:
     Router(cJSON * request);
-    ~Router();
+    ~Router() = default;
     void filterRequest();
 private:
     cJSON * request;

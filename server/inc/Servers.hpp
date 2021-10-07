@@ -24,7 +24,7 @@ public:
     const double & temperature, const double & humidity);
     void updateData(const string& name, Data data);
 private:
-    Servers();
+    Servers() = default;
     ~Servers();    
     static Servers* instance;
     mutex servers_mtx;

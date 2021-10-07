@@ -19,8 +19,8 @@ public:
     Event pop();
     int size();
 private:
-    EventQueue();
-    ~EventQueue();    
+    EventQueue() = default;
+    ~EventQueue() = default;
     static EventQueue* instance;
     mutex queue_mtx;
     deque<Event> queue;

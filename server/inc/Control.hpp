@@ -25,7 +25,7 @@ public:
     ~Control(){};
     void static stop_all();
     void init_control();
-    void static update_alarm(bool is_alarm_on);
+    void static update_alarm(bool new_alarm_value);
     bool static get_alarm_status();
 };
 

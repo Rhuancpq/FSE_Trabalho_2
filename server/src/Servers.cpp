@@ -1,11 +1,6 @@
 #include "Servers.hpp"
 
-// this is a singleton class
-
 Servers * Servers::instance; 
-
-Servers::Servers(){
-}
 
 Servers::~Servers(){
     this->servers_mtx.~mutex();
@@ -42,11 +37,11 @@ DistServers Servers::getServer(const std::string & name){
 
 vector<DistServers> Servers::getServers() {
     vector<DistServers> res;
-    if(this->servers.size() > 0) {
+    if(!this->servers.empty()) {
         lock_guard<mutex> lock(this->servers_mtx);
 
-        for(auto it = this->servers.begin(); it != this->servers.end(); it++){
-            res.push_back(it->second);
+        for(auto & server : this->servers){
+            res.push_back(server.second);
         }
     }
     return res;

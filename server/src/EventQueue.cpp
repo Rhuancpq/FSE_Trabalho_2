@@ -4,12 +4,6 @@
 
 EventQueue * EventQueue::instance; 
 
-EventQueue::EventQueue(){
-}
-
-EventQueue::~EventQueue(){
-    this->queue_mtx.~mutex();
-}
 
 EventQueue* EventQueue::getInstance(){
     if(EventQueue::instance == nullptr){

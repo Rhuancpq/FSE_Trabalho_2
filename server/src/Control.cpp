@@ -9,8 +9,8 @@ void Control::stop_all() {
     is_running = false;
 }
 
-void Control::update_alarm(bool is_alarm_on) {
-    Control::is_alarm_on = is_alarm_on;
+void Control::update_alarm(bool new_alarm_value) {
+    Control::is_alarm_on = new_alarm_value;
 }
 
 bool Control::get_alarm_status() {
